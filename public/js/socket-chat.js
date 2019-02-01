@@ -1,10 +1,10 @@
 var socket = io();
 
-var params = new URLSearchParams( window.location.search );
+var params = new URLSearchParams(window.location.search);
 
-if ( !params.has('nombre') || !params.has('sala') ) {
-    window.location = 'index.html'
-    throw new Error('El nombre es necesario')
+if (!params.has('nombre') || !params.has('sala')) {
+    window.location = 'index.html';
+    throw new Error('El nombre y sala son necesarios');
 }
 
 var usuario = {
@@ -13,12 +13,15 @@ var usuario = {
 };
 
 
+
 socket.on('connect', function() {
     console.log('Conectado al servidor');
 
-    socket.emit('ingresarChat',usuario, function(resp) {
-        console.log('Usuarios conectados: ', resp); 
-    })
+    socket.emit('entrarChat', usuario, function(resp) {
+        console.log('Usuarios conectados', resp);
+        renderizarUsuarios(resp);
+    });
+
 });
 
 // escuchar
@@ -29,29 +32,39 @@ socket.on('disconnect', function() {
 });
 
 
-
 // Enviar información
-// socket.emit('enviarMensaje', {
-//     usuario: 'Fernando',
+// socket.emit('crearMensaje', {
+//     nombre: 'Fernando',
 //     mensaje: 'Hola Mundo'
 // }, function(resp) {
 //     console.log('respuesta server: ', resp);
 // });
 
-socket.on('enviarMensaje', function(resp) {
-    console.log(resp);
-})
 // Escuchar información
-socket.on('crearMensaje', function(mensaje) {
-
+socket.on('enviarMensaje', function(mensaje) {
     console.log('Servidor:', mensaje);
+    renderizarMensajes(mensaje, false);
+});
+
+// Escuchar cambios de usuarios
+// cuando un usuario entra o sale del chat
+socket.on('personasConectadas', function(personas) {
+    console.log(personas);
+    renderizarUsuarios(personas)
+});
+
+// Mensajes privados
+socket.on('mensajePrivado', function(mensaje) {
+
+    console.log('Mensaje Privado:', mensaje);
 
 });
-socket.on('mensajePrivado', function(mensajePrivado){
-    console.log(mensajePrivado);
-})
-socket.on('personasConectadas', function(usuarios) {
 
-    console.log('usuarios conectados:', usuarios);
+divUsuarios.on('click', 'a', function() {
 
+    var id = $(this).data('id');
+
+    if(id){
+        console.log(id);
+    }
 });

@@ -8,7 +8,7 @@ io.on('connection', (client) => {
 
     console.log('Usuario conectado');
 
-    client.on('ingresarChat', (data, callback) => {
+    client.on('entrarChat', (data, callback) => {
         console.log(data);
 
         if(!data.nombre) {
@@ -25,11 +25,12 @@ io.on('connection', (client) => {
         callback(usuarios.getPersonaPorSala(data.sala));
     })
 
-    client.on('enviarMensaje', (resp) => {
+    client.on('enviarMensaje', (resp, callback) => {
         let persona = usuarios.getPersona(client.id)
         let mensaje = enviarMensaje(persona.nombre, resp.mensaje);
 
         client.broadcast.to(persona.sala).emit('enviarMensaje', mensaje);
+        callback(mensaje);
     });
 
     client.on('mensajePrivado', (data) => {
